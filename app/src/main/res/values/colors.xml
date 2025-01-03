@@ -5,6 +5,8 @@
 
     <color name="BLUE">#2B8CFF</color>
     <color name="Grey">#808080</color>
+    <color name="LightGrey">#F5F5F5</color>
+    <color name="DarkGrey">#71797E</color>
 
     <color name="sign_in_button_text_color">#FFFFFF</color> <!-- Example white color -->
     <color name="sign_in_button_background_color">#2B8CFF</color> <!-- Example blue color -->

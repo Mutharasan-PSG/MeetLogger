@@ -1,3 +1,4 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -35,9 +36,18 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-}
 
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+    }
+}
 dependencies {
+
+// https://mvnrepository.com/artifact/io.github.webrtc-sdk/android
+    implementation("io.github.webrtc-sdk:android:125.6422.06.1")
+
+
 
     implementation(libs.firebase.auth.ktx)
     implementation ("com.squareup.picasso:picasso:2.71828")
@@ -49,6 +59,12 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-auth:21.3.0")
     implementation ("com.github.bumptech.glide:glide:4.15.1")
+    implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.8.5")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.8.5")
+
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
 
     implementation ("com.google.firebase:firebase-firestore:25.1.1")

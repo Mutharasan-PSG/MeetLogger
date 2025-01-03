@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share this joining with people that you want in the meeting"
+        android:textSize="18sp"
+        android:textColor="@color/DarkGrey"
+        android:fontFamily="@font/poppins_medium"
+        android:layout_marginBottom="10dp"
+        android:paddingBottom="11dp" />
+
+    <!-- Meet Link and Copy Icon -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/LightGrey"
+        android:padding="4dp"
+        android:layout_marginBottom="15dp">
+
+        <TextView
+            android:id="@+id/meetLinkTextView"
+            android:layout_width="200dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:text="https://example.com/meet/abc123"
+            android:fontFamily="@font/poppins"
+            android:padding="5dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/BLUE" />
+
+        <ImageView
+            android:id="@+id/copyIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_copy"
+            android:contentDescription="Copy link"
+            android:padding="4dp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- Buttons for Share and Join -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="7dp">
+
+        <Button
+            android:id="@+id/shareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/shaped_button"
+            android:text="Share"
+            android:fontFamily="@font/poppins_medium"
+            android:textColor="@color/black"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/joinButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/shaped_button"
+            android:text="Join"
+            android:fontFamily="@font/poppins_medium"
+            android:textColor="@color/black"
+            android:padding="8dp"/>
+    </LinearLayout>
+
+    <!-- Dismiss Text -->
+    <TextView
+        android:id="@+id/dismissTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dismiss"
+        android:textSize="16sp"
+        android:fontFamily="@font/poppins_medium"
+        android:gravity="center"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

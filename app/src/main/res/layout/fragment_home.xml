@@ -30,6 +30,8 @@
         android:scaleType="centerCrop"
         android:elevation="9dp"
         android:background="@drawable/round_border"
+        android:clickable="true"
+        android:focusable="true"
         android:contentDescription="User Profile Picture" />
 
     <!-- Meet Button -->
@@ -82,5 +84,115 @@
         app:itemIconTint="@color/nav_icon_colors"
         app:itemTextColor="@color/nav_text_colors"
         app:labelVisibilityMode="labeled" />
+
+    <!-- Meet Options Popup -->
+    <LinearLayout
+        android:id="@+id/meetOptionsLayout"
+        android:layout_width="195dp"
+        android:layout_height="180dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_above="@id/meetButton"
+        android:orientation="vertical"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone"
+        android:background="@color/white">
+
+        <!-- Schedule a Meet Option -->
+        <LinearLayout
+            android:id="@+id/ScheduleMeet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:gravity="end">  <!-- Right-aligning the content -->
+
+            <TextView
+                android:id="@+id/btnScheduleMeet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="Schedule a Meet"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="1dp"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/schedule" />
+        </LinearLayout>
+
+
+        <!-- Join a Meet Option -->
+        <LinearLayout
+            android:id="@+id/joinMeet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:gravity="end">  <!-- Right-aligning the content -->
+
+            <TextView
+                android:id="@+id/btnJoinMeet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="Join a Meet"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="1dp"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/join_meet" />
+        </LinearLayout>
+
+        <!-- Create a New Meet Option -->
+        <LinearLayout
+            android:id="@+id/NewMeet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:gravity="end">  <!-- Right-aligning the content -->
+
+            <TextView
+                android:id="@+id/btnCreateMeet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="Create New Meet"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="1dp"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/new_meet" />
+        </LinearLayout>
+
+
+    <!-- Close Button -->
+        <ImageView
+            android:id="@+id/closeButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="2dp"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_close"
+            android:contentDescription="Close"
+            android:background="@drawable/circle_border" />
+
+    </LinearLayout>
 
 </RelativeLayout>
