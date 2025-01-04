@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Title for the meeting room -->
+    <TextView
+        android:id="@+id/meetingTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Meeting Room"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Participants Grid -->
+    <GridView
+        android:id="@+id/participantsGridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="3"
+        android:layout_marginBottom="16dp"
+        android:columnWidth="80dp"
+        android:stretchMode="columnWidth"/>
+
+    <!-- Buttons for meeting controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
+
+        <!-- Mic On/Off Button -->
+        <Button
+            android:id="@+id/muteUnmuteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mic On/Off"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/white"/>
+
+        <!-- Raise Hand Button -->
+        <Button
+            android:id="@+id/raiseHandButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Raise Hand"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/white"/>
+
+        <!-- End Meeting Button -->
+        <Button
+            android:id="@+id/endMeetingButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End Meeting"
+            android:backgroundTint="@color/Pink"/>
+    </LinearLayout>
+
+    <!-- Status Text for the meeting -->
+    <TextView
+        android:id="@+id/meetingStatusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status: Connecting..."
+        android:textSize="14sp"
+        android:layout_marginTop="16dp"
+        android:gravity="center"/>
+</LinearLayout>

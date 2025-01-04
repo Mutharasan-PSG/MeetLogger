@@ -1,11 +1,6 @@
 <!-- res/drawable/shaped_button.xml -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Background Color for the Button -->
-    <solid android:color="@android:color/white" />
-
-    <!-- Border Color and Width -->
-    <stroke android:width="3dp" android:color="#FF0000" /> <!-- Red border for testing purposes -->
-
     <!-- Rounded Corners for Visual Appeal -->
     <corners android:radius="8dp"/>
 </shape>

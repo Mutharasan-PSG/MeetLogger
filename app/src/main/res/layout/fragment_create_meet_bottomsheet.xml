@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
     android:background="@android:color/white">
@@ -12,39 +12,55 @@
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Share this joining with people that you want in the meeting"
-        android:textSize="18sp"
+        android:text="Share this joining link and passkey with authorized participants."
+        android:textSize="19sp"
         android:textColor="@color/DarkGrey"
         android:fontFamily="@font/poppins_medium"
-        android:layout_marginBottom="10dp"
-        android:paddingBottom="11dp" />
+        android:layout_marginBottom="10dp" />
 
-    <!-- Meet Link and Copy Icon -->
+    <!-- Meet Link Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="@color/LightGrey"
-        android:padding="4dp"
-        android:layout_marginBottom="15dp">
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="25dp">
 
         <TextView
-            android:id="@+id/meetLinkTextView"
-            android:layout_width="200dp"
-            android:layout_height="28dp"
-            android:layout_weight="1"
-            android:text="https://example.com/meet/abc123"
+            android:id="@+id/meetID"
+            android:layout_width="wrap_content"
+            android:layout_height="33dp"
+            android:text="Meeting ID"
+            android:textSize="17sp"
             android:fontFamily="@font/poppins"
             android:padding="5dp"
             android:ellipsize="end"
             android:singleLine="true"
+            android:background="@color/white"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/meetLinkTextView"
+            android:layout_width="179dp"
+            android:layout_height="36dp"
+            android:text=""
+            android:textSize="17sp"
+            android:elevation="5dp"
+            android:background="@color/LightGrey"
+            android:fontFamily="@font/poppins_medium"
+            android:gravity="center"
+            android:padding="3dp"
+            android:singleLine="true"
+            android:textIsSelectable="true"
             android:textColor="@color/BLUE" />
 
         <ImageView
             android:id="@+id/copyIcon"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/ic_copy"
             android:contentDescription="Copy link"
             android:padding="4dp"
@@ -52,37 +68,102 @@
             android:focusable="true" />
     </LinearLayout>
 
-    <!-- Buttons for Share and Join -->
+    <!-- Passkey Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="7dp">
+        android:gravity="center_vertical"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="5dp">
 
-        <Button
+        <TextView
+            android:id="@+id/passKeyLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="33dp"
+            android:text="Passkey"
+            android:textSize="17sp"
+            android:fontFamily="@font/poppins"
+            android:padding="5dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:background="@color/white"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/passKeyTextView"
+            android:layout_width="64dp"
+            android:layout_height="36dp"
+            android:text=""
+            android:textSize="17sp"
+            android:elevation="5dp"
+            android:background="@color/LightGrey"
+            android:fontFamily="@font/poppins_medium"
+            android:gravity="center"
+            android:padding="3dp"
+            android:singleLine="true"
+            android:textIsSelectable="true"
+            android:textColor="@color/BLUE" />
+
+        <ImageView
+            android:id="@+id/passKeyCopyIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_copy"
+            android:contentDescription="Copy passkey"
+            android:padding="4dp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+    <!-- Share Section -->
+    <LinearLayout
+        android:id="@+id/shareLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:id="@+id/share"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/share"
+            android:contentDescription="Share Icon"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
             android:id="@+id/shareButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shaped_button"
-            android:text="Share"
+            android:layout_marginStart="8dp"
             android:fontFamily="@font/poppins_medium"
-            android:textColor="@color/black"
-            android:padding="8dp" />
+            android:text="SHARE"
+            android:textSize="16sp"
+            android:textColor="@color/black" />
 
-        <Button
+        <ImageView
+            android:id="@+id/joinIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/joinlink"
+            android:contentDescription="Join Icon"
+            android:layout_marginStart="35dp"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
             android:id="@+id/joinButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:background="@drawable/shaped_button"
-            android:text="Join"
             android:fontFamily="@font/poppins_medium"
-            android:textColor="@color/black"
-            android:padding="8dp"/>
+            android:text="JOIN"
+            android:textSize="16sp"
+            android:textColor="@color/black" />
     </LinearLayout>
-
     <!-- Dismiss Text -->
     <TextView
         android:id="@+id/dismissTextView"
