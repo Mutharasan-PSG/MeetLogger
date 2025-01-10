@@ -7,10 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.MeetLogger.databinding.FragmentJoinMeetBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 class JoinMeetFragment : Fragment() {
 
@@ -47,13 +46,83 @@ class JoinMeetFragment : Fragment() {
     }
 
     private fun validateMeeting(meetingId: String, passkey: String) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val userId = currentUser?.uid ?: return
+        val userEmail = currentUser.email ?: "Unknown"
+        val userName = currentUser.displayName ?: "Anonymous User"
+        val profileImage = currentUser.photoUrl?.toString() ?: ""
+
         firestore.collection("MeetingInfo")
             .whereEqualTo("meetingId", meetingId)
             .whereEqualTo("passkey", passkey)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 if (querySnapshot != null && !querySnapshot.isEmpty) {
-                    navigateToMeetingFragment(meetingId)
+                    val document = querySnapshot.documents[0]
+                    val meetingRef = firestore.collection("MeetingInfo").document(document.id)
+
+                    // Fetch existing participants
+                    val participants = document["participants"] as? List<Map<String, Any>> ?: emptyList()
+
+                    // Check if the user is already in the participants list
+                    val isAlreadyParticipant = participants.any { it["userId"] == userId }
+
+                    if (isAlreadyParticipant) {
+                        // Update only the status of the user
+                        val updatedParticipants = participants.map { participant ->
+                            if (participant["userId"] == userId) {
+                                participant.toMutableMap().apply { put("status", "active") }
+                            } else {
+                                participant
+                            }
+                        }
+
+                        // Update the participants list
+                        meetingRef.update("participants", updatedParticipants)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    context,
+                                    "Updated status successfully.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                navigateToMeetingFragment(meetingId)
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(context, "Error updating status.", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                    } else {
+                        // If not in the list, add the user as a new participant
+                        val newParticipant = mapOf(
+                            "userId" to userId,
+                            "name" to userName,
+                            "email" to userEmail,
+                            "profileImage" to profileImage,
+                            "status" to "active"
+                        )
+
+                        meetingRef.update("participants", FieldValue.arrayUnion(newParticipant))
+                            .addOnSuccessListener {
+                                // Increment the count field
+                                meetingRef.update("count", FieldValue.increment(1))
+                                    .addOnSuccessListener {
+                                        Toast.makeText(
+                                            context,
+                                            "Joined meeting successfully.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        navigateToMeetingFragment(meetingId)
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(context, "Error joining meeting.", Toast.LENGTH_SHORT)
+                                            .show()
+                                    }
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(context, "Error joining meeting.", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                    }
                 } else {
                     Toast.makeText(context, "Invalid Meeting ID or Passkey", Toast.LENGTH_SHORT).show()
                 }
@@ -74,15 +143,29 @@ class JoinMeetFragment : Fragment() {
     }
 
     private fun navigateToMeetingFragment(meetingId: String) {
-        val meetingFragment = MeetingFragment().apply {
-            arguments = Bundle().apply {
-                putString("MEETING_ID", meetingId)
-            }
+        val fragmentTransaction = parentFragmentManager.beginTransaction()
+
+        val currentFragment = parentFragmentManager.findFragmentById(R.id.fragment_container)
+        if (currentFragment != null) {
+            fragmentTransaction.hide(currentFragment)
         }
 
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, meetingFragment)
-            .addToBackStack(null)
-            .commit()
+        val meetingFragment = parentFragmentManager.findFragmentByTag("MeetingFragment") as? MeetingFragment
+        if (meetingFragment != null) {
+            fragmentTransaction.show(meetingFragment)
+        } else {
+            fragmentTransaction.add(
+                R.id.fragment_container,
+                MeetingFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("MEETING_ID", meetingId)
+                    }
+                },
+                "MeetingFragment"
+            )
+        }
+
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
     }
 }

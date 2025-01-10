@@ -15,7 +15,6 @@ import com.example.MeetLogger.databinding.FragmentCreateMeetBottomsheetBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.time.LocalTime
@@ -64,6 +63,7 @@ class CreateMeetBottomSheetFragment : BottomSheetDialogFragment() {
         val userId = currentUser?.uid ?: "Anonymous"
         val userEmail = currentUser?.email ?: "Unknown"
         val userName = currentUser?.displayName ?: "Anonymous User"
+        val profileImage = currentUser?.photoUrl?.toString() ?: ""
 
         val calendar = Calendar.getInstance()
         val year = SimpleDateFormat("yyyy", Locale.getDefault()).format(calendar.time)
@@ -71,6 +71,16 @@ class CreateMeetBottomSheetFragment : BottomSheetDialogFragment() {
         val day = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(calendar.time)
 
         val combinedDocId = "$year-$month-$day-$meetingId"
+
+        val participants = listOf(
+            mapOf(
+                "userId" to userId,
+                "name" to userName,
+                "email" to userEmail,
+                "profileImage" to profileImage,
+                "status" to "active"
+            )
+        )
 
         // Data to store
         val meetingData = mapOf(
@@ -80,7 +90,10 @@ class CreateMeetBottomSheetFragment : BottomSheetDialogFragment() {
             "creatorId" to userId,
             "creatorEmail" to userEmail,
             "creatorName" to userName,
-            "createdAt" to Timestamp.now()
+            "createdAt" to Timestamp.now(),
+            "participants" to participants,
+            "count" to 1 // Initially, only the host is present.
+
         )
 
         // Save to Combined Structure

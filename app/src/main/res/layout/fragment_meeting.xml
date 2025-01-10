@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,7 +23,7 @@
         android:layout_height="wrap_content"
         android:numColumns="3"
         android:layout_marginBottom="16dp"
-        android:columnWidth="80dp"
+        android:columnWidth="100dp"
         android:stretchMode="columnWidth"/>
 
     <!-- Buttons for meeting controls -->
@@ -41,8 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Mic On/Off"
-            android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/white"/>
+            android:layout_marginEnd="16dp"/>
 
         <!-- Raise Hand Button -->
         <Button
@@ -50,25 +48,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Raise Hand"
-            android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/white"/>
+            android:layout_marginEnd="16dp"/>
 
         <!-- End Meeting Button -->
         <Button
-            android:id="@+id/endMeetingButton"
+            android:id="@+id/leaveMeetingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="End Meeting"
+            android:text="Leave Meeting"
             android:backgroundTint="@color/Pink"/>
     </LinearLayout>
 
-    <!-- Status Text for the meeting -->
-    <TextView
-        android:id="@+id/meetingStatusTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Status: Connecting..."
-        android:textSize="14sp"
-        android:layout_marginTop="16dp"
-        android:gravity="center"/>
 </LinearLayout>
