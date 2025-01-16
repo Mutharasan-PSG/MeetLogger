@@ -1,15 +1,16 @@
-
 package com.example.MeetLogger
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.MeetLogger.databinding.FragmentMeetingBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MeetingFragment : Fragment() {
 
@@ -17,15 +18,11 @@ class MeetingFragment : Fragment() {
     private val binding get() = _binding!!
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
-
+    private var isCreator = false
     private lateinit var meetingId: String
     private lateinit var userId: String
-    private var isCreator = false
-    private lateinit var participantsList: MutableList<Map<String, String>>
-
-    private val participantAdapter: ArrayAdapter<String> by lazy {
-        ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1)
-    }
+    private var participantsList: MutableList<Map<String, String>> = mutableListOf()
+    private lateinit var adapter: ParticipantsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,13 +30,16 @@ class MeetingFragment : Fragment() {
     ): View {
         _binding = FragmentMeetingBinding.inflate(inflater, container, false)
 
+        // Extract meeting ID and set up user ID
         arguments?.getString("MEETING_ID")?.let {
             meetingId = it
-            userId = auth.currentUser?.uid ?: ""
+            userId = auth.currentUser?.uid.orEmpty()
             fetchMeetingDetails(meetingId)
-        } ?: Toast.makeText(context, "No Meeting ID provided", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            Toast.makeText(context, "No Meeting ID provided", Toast.LENGTH_SHORT).show()
+        }
 
-        setupParticipantsGridView()
+        setupParticipantsRecyclerView()
 
         return binding.root
     }
@@ -49,50 +49,68 @@ class MeetingFragment : Fragment() {
         _binding = null
     }
 
-    private fun setupParticipantsGridView() {
-        val participantsGridView = binding.participantsGridView
-        participantsList = mutableListOf()
+    private fun setupParticipantsRecyclerView() {
+        val recyclerView = binding.participantsRecyclerView
+        adapter = ParticipantsAdapter(participantsList, ::calculateItemHeight)
+        recyclerView.adapter = adapter
 
-        participantsGridView.adapter = participantAdapter
+        val gridLayoutManager = GridLayoutManager(requireContext(), 1)
+        recyclerView.layoutManager = gridLayoutManager
 
-        // Listen for real-time updates in the participants collection
+        // Fetch participants from Firestore before setting the grid
         firestore.collection("MeetingInfo")
             .whereEqualTo("meetingId", meetingId)
-            .addSnapshotListener { querySnapshot, e ->
-                if (e != null) {
-                    Toast.makeText(context, "Error fetching participants", Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
-                }
+            .get()
+            .addOnSuccessListener { documents ->
+                val participants = documents.flatMap {
+                    it["participants"] as? List<Map<String, String>> ?: emptyList()
+                }.filter { it["status"] != "inactive" }
 
-                querySnapshot?.documents?.forEach { document ->
-                    val participants = document["participants"] as? List<Map<String, String>> ?: emptyList()
-                    updateParticipantList(participants)
-                }
+                updateParticipantsGrid(participants)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Failed to load participants: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun updateParticipantList(participants: List<Map<String, String>>) {
-        // Filter out inactive participants
-        val activeParticipants = participants.filter { it["status"] != "inactive" }
-
-        // Update the participants list with only active ones
+    private fun updateParticipantsGrid(participants: List<Map<String, String>>) {
         participantsList.clear()
-        participantsList.addAll(activeParticipants)
+        participantsList.addAll(participants)
 
-        val participantNames = participantsList.map { it["name"].toString() }
-        participantAdapter.clear()
-        participantAdapter.addAll(participantNames)
+        val activeParticipants = participantsList.size
+        val spanCount = when {
+            activeParticipants <= 2 -> 1
+            activeParticipants <= 4 -> 2
+            else -> 2 // Keep 2 columns for larger groups
+        }
 
-        // Update count and handle UI changes (expand/shrink GridView dynamically)
-        updateMeetingCount()
+        (binding.participantsRecyclerView.layoutManager as GridLayoutManager).spanCount = spanCount
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun calculateItemHeight(): Int {
+        val displayMetrics = requireContext().resources.displayMetrics
+        val totalHeight = displayMetrics.heightPixels
+        val participantCount = participantsList.size
+        return when {
+            participantCount <= 2 -> (totalHeight - dpToPx(100)) / participantCount
+            participantCount <= 4 -> (totalHeight - dpToPx(150)) / 2
+            else -> (totalHeight - dpToPx(150)) / 4 // Scrolling case
+        }
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        val density = requireContext().resources.displayMetrics.density
+        return (dp * density).toInt()
     }
 
     private fun fetchMeetingDetails(meetingId: String) {
-        firestore.collection("MeetingInfo").get()
+        firestore.collection("MeetingInfo")
+            .whereEqualTo("meetingId", meetingId)
+            .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
                     if (document["meetingId"] == meetingId) {
-                        isCreator = document["creatorId"] == userId
                         initializeMeeting()
                         break
                     }
@@ -110,52 +128,19 @@ class MeetingFragment : Fragment() {
             Toast.makeText(context, "Welcome to the meeting!", Toast.LENGTH_SHORT).show()
         }
 
-        // Leave meeting button logic
-        binding.leaveMeetingButton.setOnClickListener {
-            leaveMeeting()
-        }
-
-        // Mute/unmute mic button logic
-        binding.muteUnmuteButton.setOnClickListener {
-            toggleMic()
-        }
+        binding.leaveMeetingButton.setOnClickListener { leaveMeeting() }
+        binding.muteUnmuteButton.setOnClickListener { toggleMic() }
     }
 
-    private fun updateMeetingCount() {
-        // Count only active participants
-        val activeCount = participantsList.size
-
-        firestore.collection("MeetingInfo")
-            .whereEqualTo("meetingId", meetingId)
-            .get()
-            .addOnSuccessListener { documents ->
-                if (documents.isEmpty()) {
-                    val doc = documents.first()
-                    val meetingRef = doc.reference
-
-                    // Decrement the count only for leaving participant, we use the current size of active participants
-                    meetingRef.update("count", activeCount)
-                }
-            }
-    }
-
-
-    private fun toggleMic() {
-        // Implement mute/unmute logic here
-    }
     private fun leaveMeeting() {
-        // Update the participant's status to inactive and decrease the participant count
         firestore.collection("MeetingInfo")
             .whereEqualTo("meetingId", meetingId)
             .get()
             .addOnSuccessListener { documents ->
                 documents.forEach { doc ->
                     val meetingRef = doc.reference
+                    val participants = doc.get("participants") as? List<Map<String, Any>> ?: emptyList()
 
-                    // Fetch the current participants
-                    val participants = doc.get("participants") as? List<Map<String, Any>> ?: listOf()
-
-                    // Create a new list with updated status for the userId
                     val updatedParticipants = participants.map { participant ->
                         if (participant["userId"] == userId) {
                             participant.toMutableMap().apply { put("status", "inactive") }
@@ -164,27 +149,17 @@ class MeetingFragment : Fragment() {
                         }
                     }
 
-                    // Now update the 'participants' list in the Firestore document
                     meetingRef.update("participants", updatedParticipants)
                         .addOnSuccessListener {
-                            // Update the participant count after leaving
                             updateMeetingCount()
-
-                            // Navigate back to the home fragment
                             parentFragmentManager.beginTransaction()
                                 .replace(R.id.fragment_container, HomeFragment())
                                 .addToBackStack(null)
                                 .commit()
-
-                            // Show success message
                             Toast.makeText(context, "You have left the meeting.", Toast.LENGTH_SHORT).show()
                         }
                         .addOnFailureListener { error ->
-                            Toast.makeText(
-                                context,
-                                "Failed to leave meeting. Please try again: ${error.message}",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(context, "Failed to leave meeting: ${error.message}", Toast.LENGTH_SHORT).show()
                         }
                 }
             }
@@ -193,5 +168,19 @@ class MeetingFragment : Fragment() {
             }
     }
 
+    private fun updateMeetingCount() {
+        firestore.collection("MeetingInfo")
+            .whereEqualTo("meetingId", meetingId)
+            .get()
+            .addOnSuccessListener { documents ->
+                documents.firstOrNull()?.reference?.update("count", participantsList.size)
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to update participant count", Toast.LENGTH_SHORT).show()
+            }
+    }
 
+    private fun toggleMic() {
+        Toast.makeText(context, "Toggle mic functionality not yet implemented.", Toast.LENGTH_SHORT).show()
+    }
 }

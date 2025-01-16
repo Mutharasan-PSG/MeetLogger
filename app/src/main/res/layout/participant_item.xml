@@ -1,0 +1,18 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:orientation="vertical"
+    android:background="@android:color/darker_gray"
+    android:layout_margin="4dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/participantNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Participant"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:gravity="center" />
+</LinearLayout>

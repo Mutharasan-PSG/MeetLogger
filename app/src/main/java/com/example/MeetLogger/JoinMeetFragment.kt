@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.MeetLogger.databinding.FragmentJoinMeetBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -41,6 +42,11 @@ class JoinMeetFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            // Update button UI and disable it temporarily
+            binding.joinMeetingButton.text = "Joining..."
+            binding.joinMeetingButton.setTextColor(resources.getColor(R.color.red, null)) // Set color to red
+            binding.joinMeetingButton.isEnabled = false
+
             validateMeeting(meetingId, passkey)
         }
     }
@@ -61,77 +67,83 @@ class JoinMeetFragment : Fragment() {
                     val document = querySnapshot.documents[0]
                     val meetingRef = firestore.collection("MeetingInfo").document(document.id)
 
-                    // Fetch existing participants
+                    // Check if the user is already a participant
                     val participants = document["participants"] as? List<Map<String, Any>> ?: emptyList()
-
-                    // Check if the user is already in the participants list
                     val isAlreadyParticipant = participants.any { it["userId"] == userId }
 
                     if (isAlreadyParticipant) {
-                        // Update only the status of the user
-                        val updatedParticipants = participants.map { participant ->
-                            if (participant["userId"] == userId) {
-                                participant.toMutableMap().apply { put("status", "active") }
-                            } else {
-                                participant
-                            }
-                        }
-
-                        // Update the participants list
-                        meetingRef.update("participants", updatedParticipants)
-                            .addOnSuccessListener {
-                                Toast.makeText(
-                                    context,
-                                    "Updated status successfully.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                navigateToMeetingFragment(meetingId)
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, "Error updating status.", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
+                        // Update only status
+                        updateParticipantStatus(meetingRef, participants, userId,meetingId)
                     } else {
-                        // If not in the list, add the user as a new participant
-                        val newParticipant = mapOf(
-                            "userId" to userId,
-                            "name" to userName,
-                            "email" to userEmail,
-                            "profileImage" to profileImage,
-                            "status" to "active"
-                        )
-
-                        meetingRef.update("participants", FieldValue.arrayUnion(newParticipant))
-                            .addOnSuccessListener {
-                                // Increment the count field
-                                meetingRef.update("count", FieldValue.increment(1))
-                                    .addOnSuccessListener {
-                                        Toast.makeText(
-                                            context,
-                                            "Joined meeting successfully.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        navigateToMeetingFragment(meetingId)
-                                    }
-                                    .addOnFailureListener {
-                                        Toast.makeText(context, "Error joining meeting.", Toast.LENGTH_SHORT)
-                                            .show()
-                                    }
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, "Error joining meeting.", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
+                        // Add as a new participant
+                        addParticipant(meetingRef, userId, userName, userEmail, profileImage,meetingId)
                     }
                 } else {
-                    Toast.makeText(context, "Invalid Meeting ID or Passkey", Toast.LENGTH_SHORT).show()
+                    showErrorAndResetUI("Invalid Meeting ID or Passkey")
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(context, "An error occurred. Please try again.", Toast.LENGTH_SHORT).show()
+                showErrorAndResetUI("An error occurred. Please try again.")
             }
     }
 
+    private fun updateParticipantStatus(meetingRef: DocumentReference, participants: List<Map<String, Any>>, userId: String,meetingId: String) {
+        val updatedParticipants = participants.map { participant ->
+            if (participant["userId"] == userId) {
+                participant.toMutableMap().apply { put("status", "active") }
+            } else {
+                participant
+            }
+        }
+
+        meetingRef.update("participants", updatedParticipants)
+            .addOnSuccessListener {
+                navigateToMeetingFragmentAndResetUI(meetingId)
+            }
+            .addOnFailureListener {
+                showErrorAndResetUI("Error updating status.")
+            }
+    }
+
+    private fun addParticipant(meetingRef: DocumentReference, userId: String, userName: String, userEmail: String, profileImage: String,meetingId: String) {
+        val newParticipant = mapOf(
+            "userId" to userId,
+            "name" to userName,
+            "email" to userEmail,
+            "profileImage" to profileImage,
+            "status" to "active"
+        )
+
+        meetingRef.update("participants", FieldValue.arrayUnion(newParticipant))
+            .addOnSuccessListener {
+                meetingRef.update("count", FieldValue.increment(1))
+                    .addOnSuccessListener {
+                        navigateToMeetingFragmentAndResetUI(meetingId)
+                    }
+                    .addOnFailureListener {
+                        showErrorAndResetUI("Error joining meeting.")
+                    }
+            }
+            .addOnFailureListener {
+                showErrorAndResetUI("Error joining meeting.")
+            }
+    }
+
+    private fun navigateToMeetingFragmentAndResetUI(meetingId: String) {
+        navigateToMeetingFragment(meetingId)
+        resetJoinMeetingUI()
+    }
+
+    private fun showErrorAndResetUI(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        resetJoinMeetingUI()
+    }
+
+    private fun resetJoinMeetingUI() {
+        binding.joinMeetingButton.text = "Join Meeting"
+        binding.joinMeetingButton.setTextColor(resources.getColor(R.color.black, null)) // Reset color to default
+        binding.joinMeetingButton.isEnabled = true
+    }
 
     private fun getHourSlot(): String {
         val calendar = android.icu.util.Calendar.getInstance()

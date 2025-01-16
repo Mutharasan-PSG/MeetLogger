@@ -13,18 +13,18 @@
         android:text="Meeting Room"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="16dp"/>
+        android:gravity="start"
+        android:layout_marginBottom="7dp" />
 
-    <!-- Participants Grid -->
-    <GridView
-        android:id="@+id/participantsGridView"
+    <!-- Participants RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/participantsRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:numColumns="3"
-        android:layout_marginBottom="16dp"
-        android:columnWidth="100dp"
-        android:stretchMode="columnWidth"/>
+        android:layout_height="0dp"
+        android:layout_marginTop="7dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="8dp" />
 
     <!-- Buttons for meeting controls -->
     <LinearLayout
@@ -32,31 +32,46 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="6dp">
 
         <!-- Mic On/Off Button -->
-        <Button
+        <ImageButton
             android:id="@+id/muteUnmuteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mic On/Off"
-            android:layout_marginEnd="16dp"/>
+            android:layout_width="35dp"
+            android:layout_height="42dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/mic"
+            android:background="@null"
+            android:contentDescription="Mic Button"
+            android:layout_marginStart="70dp"
+            android:layout_marginEnd="26dp" />
 
         <!-- Raise Hand Button -->
-        <Button
+        <ImageButton
             android:id="@+id/raiseHandButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Raise Hand"
-            android:layout_marginEnd="16dp"/>
+            android:layout_width="32dp"
+            android:layout_height="35dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/hand"
+            android:background="@null"
+            android:padding="5dp"
+            android:contentDescription="Raise Hand Button"
+            android:layout_marginEnd="6dp" />
 
-        <!-- End Meeting Button -->
+        <!-- Leave Meeting Button -->
         <Button
             android:id="@+id/leaveMeetingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Leave Meeting"
-            android:backgroundTint="@color/Pink"/>
+            android:text="Leave"
+            android:layout_marginStart="70dp"
+            android:layout_marginRight="5dp"
+            android:drawablePadding="8dp"
+            android:backgroundTint="@color/Pink"
+            android:textColor="@android:color/black"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </LinearLayout>
